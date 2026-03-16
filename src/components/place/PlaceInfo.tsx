@@ -19,9 +19,11 @@ export default function PlaceInfo({
   parking,
   useTime,
 }: PlaceInfoProps) {
+  const hasAnyInfo = overview || tel || homepage || openTime || restDate || parking || useTime;
+
   return (
     <section className="mb-8 space-y-6">
-      {overview && (
+      {overview ? (
         <div>
           <h2 className="mb-2 text-xl font-semibold">About</h2>
           <div
@@ -29,27 +31,36 @@ export default function PlaceInfo({
             dangerouslySetInnerHTML={{ __html: overview }}
           />
         </div>
+      ) : (
+        <div>
+          <h2 className="mb-2 text-xl font-semibold">About</h2>
+          <p className="text-muted-foreground italic">
+            Travel information coming soon.
+          </p>
+        </div>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Information</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-3 sm:grid-cols-2">
-          {tel && <InfoRow label="Phone" value={tel} />}
-          {homepage && (
-            <InfoRow
-              label="Website"
-              value={homepage}
-              isHtml
-            />
-          )}
-          {openTime && <InfoRow label="Hours" value={openTime} isHtml />}
-          {restDate && <InfoRow label="Closed" value={restDate} isHtml />}
-          {parking && <InfoRow label="Parking" value={parking} isHtml />}
-          {useTime && <InfoRow label="Fee" value={useTime} isHtml />}
-        </CardContent>
-      </Card>
+      {hasAnyInfo && (tel || homepage || openTime || restDate || parking || useTime) && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Information</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-3 sm:grid-cols-2">
+            {tel && <InfoRow label="Phone" value={tel} />}
+            {homepage && (
+              <InfoRow
+                label="Website"
+                value={homepage}
+                isHtml
+              />
+            )}
+            {openTime && <InfoRow label="Hours" value={openTime} isHtml />}
+            {restDate && <InfoRow label="Closed" value={restDate} isHtml />}
+            {parking && <InfoRow label="Parking" value={parking} isHtml />}
+            {useTime && <InfoRow label="Fee" value={useTime} isHtml />}
+          </CardContent>
+        </Card>
+      )}
     </section>
   );
 }

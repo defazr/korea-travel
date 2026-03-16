@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CONTENT_TYPE_MAP, AREA_CODE_MAP } from "@/lib/constants";
+import { PLACEHOLDER_IMAGE } from "@/lib/image";
 import type { Place } from "@/lib/queries";
 
 interface NearbySectionProps {
@@ -23,17 +24,15 @@ export default function NearbySection({ places }: NearbySectionProps) {
           return (
             <Link key={place.content_id} href={href}>
               <Card className="hover:bg-muted/50 h-full transition-colors">
-                {place.first_image && (
-                  <div className="relative aspect-video overflow-hidden rounded-t-lg">
-                    <Image
-                      src={place.first_image}
-                      alt={place.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    />
-                  </div>
-                )}
+                <div className="relative aspect-video overflow-hidden rounded-t-lg">
+                  <Image
+                    src={place.first_image || PLACEHOLDER_IMAGE}
+                    alt={place.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                </div>
                 <CardContent className="p-3">
                   <Badge variant="outline" className="mb-1 text-xs">
                     {category}

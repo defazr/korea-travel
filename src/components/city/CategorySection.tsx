@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { PLACEHOLDER_IMAGE } from "@/lib/image";
 import type { Place } from "@/lib/queries";
 
 interface CategorySectionProps {
@@ -40,17 +41,15 @@ export default function CategorySection({
             href={`/${lang}/${city}/${category}/${place.slug}`}
           >
             <Card className="hover:bg-muted/50 h-full transition-colors">
-              {place.first_image && (
-                <div className="relative aspect-video overflow-hidden rounded-t-lg">
-                  <Image
-                    src={place.first_image}
-                    alt={place.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  />
-                </div>
-              )}
+              <div className="relative aspect-video overflow-hidden rounded-t-lg">
+                <Image
+                  src={place.first_image || PLACEHOLDER_IMAGE}
+                  alt={place.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                />
+              </div>
               <CardContent className="p-3">
                 <h3 className="text-sm font-medium">{place.title}</h3>
                 {place.addr1 && (
