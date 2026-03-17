@@ -6,12 +6,17 @@ Set TOURAPI_KEY environment variable before running crawlers.
 import os
 import re
 import time
+from pathlib import Path
+
 import requests
 import psycopg2
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
 # TourAPI
 TOURAPI_KEY = os.environ.get("TOURAPI_KEY", "")
-TOURAPI_BASE = "http://apis.data.go.kr/B551011/EngService1"
+TOURAPI_BASE = "https://apis.data.go.kr/B551011/EngService2"
 
 # Database
 DB_CONFIG = {
@@ -22,16 +27,16 @@ DB_CONFIG = {
     "password": os.environ.get("DB_PASSWORD", ""),
 }
 
-# Content type mapping
+# Content type mapping (EngService2)
 CONTENT_TYPE_MAP = {
-    12: "attractions",
-    14: "culture",
-    15: "festivals",
-    25: "courses",
-    28: "leisure",
-    32: "hotels",
-    38: "shopping",
-    39: "restaurants",
+    75: "courses",
+    76: "attractions",
+    77: "leisure",
+    78: "culture",
+    79: "shopping",
+    80: "hotels",
+    82: "restaurants",
+    85: "festivals",
 }
 
 
@@ -50,6 +55,11 @@ def to_slug(title: str) -> str:
     return slug
 
 
+class QuotaExhaustedError(Exception):
+    """Raised when TourAPI daily quota is exhausted."""
+    pass
+
+
 def api_request(endpoint: str, params: dict) -> dict:
     """Make a TourAPI request with retry logic."""
     params["serviceKey"] = TOURAPI_KEY
@@ -62,12 +72,24 @@ def api_request(endpoint: str, params: dict) -> dict:
     for attempt in range(3):
         try:
             resp = requests.get(url, params=params, timeout=30)
+            if resp.status_code == 429:
+                body_text = resp.text.strip().lower()
+                if "quota" in body_text or "exceeded" in body_text:
+                    raise QuotaExhaustedError(
+                        "TourAPI daily quota exhausted. Wait until midnight KST for reset."
+                    )
+                wait = 10 * (attempt + 1)
+                print(f"  Rate limited, waiting {wait}s...")
+                time.sleep(wait)
+                continue
             resp.raise_for_status()
             data = resp.json()
             return data.get("response", {}).get("body", {})
+        except QuotaExhaustedError:
+            raise
         except Exception as e:
             print(f"  Attempt {attempt + 1} failed: {e}")
             if attempt < 2:
-                time.sleep(2 ** attempt)
+                time.sleep(3 * (attempt + 1))
 
     return {}

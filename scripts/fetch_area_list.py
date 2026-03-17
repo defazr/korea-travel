@@ -8,7 +8,7 @@ from config import get_db, to_slug, api_request, CONTENT_TYPE_MAP
 
 
 def fetch_area_list(content_type_id: int | None = None):
-    """Fetch places from areaBasedList1 endpoint."""
+    """Fetch places from areaBasedList2 endpoint."""
     db = get_db()
     cur = db.cursor()
 
@@ -20,14 +20,17 @@ def fetch_area_list(content_type_id: int | None = None):
         total_inserted = 0
 
         while True:
-            body = api_request("areaBasedList1", {
+            body = api_request("areaBasedList2", {
                 "contentTypeId": ctype,
                 "numOfRows": 100,
                 "pageNo": page,
                 "arrange": "A",
             })
 
-            items = body.get("items", {}).get("item", [])
+            raw_items = body.get("items", "")
+            if not raw_items or not isinstance(raw_items, dict):
+                break
+            items = raw_items.get("item", [])
             if not items:
                 break
 
@@ -40,7 +43,13 @@ def fetch_area_list(content_type_id: int | None = None):
                 if not content_id or not title:
                     continue
 
-                slug = to_slug(title)
+                slug = to_slug(title) or f"place-{content_id}"
+                # Append content_id to ensure uniqueness
+                slug = f"{slug}-{content_id}"
+
+                def n(v):
+                    """Convert empty string to None."""
+                    return v if v else None
 
                 cur.execute("""
                     INSERT INTO places (content_id, content_type_id, title, slug, addr1, addr2,
@@ -55,17 +64,17 @@ def fetch_area_list(content_type_id: int | None = None):
                         first_image = EXCLUDED.first_image
                 """, (
                     content_id,
-                    item.get("contenttypeid"),
+                    n(item.get("contenttypeid")),
                     title,
                     slug,
-                    item.get("addr1"),
-                    item.get("addr2"),
-                    item.get("areacode"),
-                    item.get("sigungucode"),
-                    item.get("mapx"),
-                    item.get("mapy"),
-                    item.get("tel"),
-                    item.get("firstimage"),
+                    n(item.get("addr1")),
+                    n(item.get("addr2")),
+                    n(item.get("areacode")),
+                    n(item.get("sigungucode")),
+                    n(item.get("mapx")),
+                    n(item.get("mapy")),
+                    n(item.get("tel")),
+                    n(item.get("firstimage")),
                 ))
                 total_inserted += 1
 

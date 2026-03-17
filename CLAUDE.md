@@ -46,18 +46,18 @@ Korea Tourism Organization TourAPI
 - Language: English API first
 - Key identifier: contentId (shared across languages)
 
-## Content Type Mapping
+## Content Type Mapping (EngService2 — DB 기준)
 
 | contentTypeId | Category    |
 |---------------|-------------|
-| 12            | attractions |
-| 14            | culture     |
-| 15            | festivals   |
-| 25            | courses     |
-| 28            | leisure     |
-| 32            | hotels      |
-| 38            | shopping    |
-| 39            | restaurants |
+| 75            | courses     |
+| 76            | attractions |
+| 77            | leisure     |
+| 78            | culture     |
+| 79            | shopping    |
+| 80            | hotels      |
+| 82            | restaurants |
+| 85            | festivals   |
 
 ## URL Structure
 

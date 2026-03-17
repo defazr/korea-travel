@@ -5,7 +5,7 @@ Usage: python3 scripts/fetch_detail_common.py [--limit 100]
 
 import argparse
 import time
-from config import get_db, api_request
+from config import get_db, api_request, QuotaExhaustedError
 
 
 def fetch_detail_common(limit: int | None = None):
@@ -27,13 +27,19 @@ def fetch_detail_common(limit: int | None = None):
     places = cur.fetchall()
     print(f"Found {len(places)} places without details")
 
+    saved = 0
     for i, (content_id, content_type_id) in enumerate(places):
-        body = api_request("detailCommon1", {
-            "contentId": content_id,
-            "contentTypeId": content_type_id,
-            "defaultYN": "Y",
-            "overviewYN": "Y",
-        })
+        try:
+            body = api_request("detailCommon2", {
+                "contentId": content_id,
+                "contentTypeId": content_type_id,
+                "defaultYN": "Y",
+                "overviewYN": "Y",
+            })
+        except QuotaExhaustedError as e:
+            print(f"\n{e}")
+            print(f"  Saved {saved}/{len(places)} before quota ran out.")
+            break
 
         items = body.get("items", {}).get("item", [])
         if isinstance(items, dict):
@@ -53,15 +59,16 @@ def fetch_detail_common(limit: int | None = None):
                 item.get("homepage"),
             ))
             db.commit()
+            saved += 1
 
         if (i + 1) % 50 == 0:
-            print(f"  Processed {i + 1}/{len(places)}")
+            print(f"  Processed {i + 1}/{len(places)}, saved {saved}")
 
-        time.sleep(0.1)  # Rate limiting
+        time.sleep(1)  # Rate limiting — 1 req/sec
 
     cur.close()
     db.close()
-    print(f"\nDone. Processed {len(places)} places.")
+    print(f"\nDone. Saved {saved}/{len(places)} places.")
 
 
 if __name__ == "__main__":

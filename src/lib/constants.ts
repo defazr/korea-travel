@@ -1,13 +1,13 @@
-// TourAPI contentTypeId → category mapping
+// TourAPI EngService2 contentTypeId → category mapping
 export const CONTENT_TYPE_MAP: Record<number, string> = {
-  12: "attractions",
-  14: "culture",
-  15: "festivals",
-  25: "courses",
-  28: "leisure",
-  32: "hotels",
-  38: "shopping",
-  39: "restaurants",
+  75: "courses",
+  76: "attractions",
+  77: "leisure",
+  78: "culture",
+  79: "shopping",
+  80: "hotels",
+  82: "restaurants",
+  85: "festivals",
 };
 
 // Reverse mapping: category → contentTypeId

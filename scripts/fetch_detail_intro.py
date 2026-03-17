@@ -5,7 +5,7 @@ Usage: python3 scripts/fetch_detail_intro.py [--limit 100]
 
 import argparse
 import time
-from config import get_db, api_request
+from config import get_db, api_request, QuotaExhaustedError
 
 
 def fetch_detail_intro(limit: int | None = None):
@@ -26,11 +26,17 @@ def fetch_detail_intro(limit: int | None = None):
     places = cur.fetchall()
     print(f"Found {len(places)} places without intro details")
 
+    saved = 0
     for i, (content_id, content_type_id) in enumerate(places):
-        body = api_request("detailIntro1", {
-            "contentId": content_id,
-            "contentTypeId": content_type_id,
-        })
+        try:
+            body = api_request("detailIntro2", {
+                "contentId": content_id,
+                "contentTypeId": content_type_id,
+            })
+        except QuotaExhaustedError as e:
+            print(f"\n{e}")
+            print(f"  Saved {saved}/{len(places)} before quota ran out.")
+            break
 
         items = body.get("items", {}).get("item", [])
         if isinstance(items, dict):
@@ -64,15 +70,16 @@ def fetch_detail_intro(limit: int | None = None):
                 WHERE content_id = %s
             """, (open_time, rest_date, parking, use_time, content_id))
             db.commit()
+            saved += 1
 
         if (i + 1) % 50 == 0:
-            print(f"  Processed {i + 1}/{len(places)}")
+            print(f"  Processed {i + 1}/{len(places)}, saved {saved}")
 
-        time.sleep(0.1)
+        time.sleep(1)
 
     cur.close()
     db.close()
-    print(f"\nDone. Processed {len(places)} places.")
+    print(f"\nDone. Saved {saved}/{len(places)} places.")
 
 
 if __name__ == "__main__":

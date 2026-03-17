@@ -5,7 +5,7 @@ Usage: python3 scripts/fetch_images.py [--limit 100]
 
 import argparse
 import time
-from config import get_db, api_request
+from config import get_db, api_request, QuotaExhaustedError
 
 
 def fetch_images(limit: int | None = None):
@@ -26,12 +26,18 @@ def fetch_images(limit: int | None = None):
     places = cur.fetchall()
     print(f"Found {len(places)} places without images")
 
+    saved = 0
     for i, (content_id,) in enumerate(places):
-        body = api_request("detailImage1", {
-            "contentId": content_id,
-            "imageYN": "Y",
-            "subImageYN": "Y",
-        })
+        try:
+            body = api_request("detailImage2", {
+                "contentId": content_id,
+                "imageYN": "Y",
+                "subImageYN": "Y",
+            })
+        except QuotaExhaustedError as e:
+            print(f"\n{e}")
+            print(f"  Saved {saved}/{len(places)} before quota ran out.")
+            break
 
         items = body.get("items", {}).get("item", [])
         if isinstance(items, dict):
@@ -49,15 +55,16 @@ def fetch_images(limit: int | None = None):
             """, (content_id, image_url, j == 0))
 
         db.commit()
+        saved += 1
 
         if (i + 1) % 50 == 0:
-            print(f"  Processed {i + 1}/{len(places)}")
+            print(f"  Processed {i + 1}/{len(places)}, saved {saved}")
 
-        time.sleep(0.1)
+        time.sleep(1)
 
     cur.close()
     db.close()
-    print(f"\nDone. Processed {len(places)} places.")
+    print(f"\nDone. Saved {saved}/{len(places)} places.")
 
 
 if __name__ == "__main__":
