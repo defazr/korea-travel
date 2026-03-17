@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import {
   getPlacesByCategory,
   countPlacesByCategory,
@@ -11,11 +12,27 @@ import {
 import CityHero from "@/components/city/CityHero";
 import CategorySection from "@/components/city/CategorySection";
 
+export const revalidate = 3600;
+
 interface PageProps {
   params: Promise<{
     lang: string;
     city: string;
   }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { city } = await params;
+  const cityName = city.charAt(0).toUpperCase() + city.slice(1);
+
+  return {
+    title: `Things to Do in ${cityName} – Korea Travel Guide`,
+    description: `Discover attractions, restaurants, and travel destinations in ${cityName}, Korea.`,
+    openGraph: {
+      title: `Things to Do in ${cityName} – Korea Travel Guide`,
+      description: `Discover attractions, restaurants, and travel destinations in ${cityName}, Korea.`,
+    },
+  };
 }
 
 export default async function CityPage({ params }: PageProps) {
@@ -57,6 +74,23 @@ export default async function CityPage({ params }: PageProps) {
           totalCount={section.count}
         />
       ))}
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "City",
+            name: cityName,
+            url: `https://travel.in-book.co.kr/${lang}/${city}`,
+            description: `Discover attractions, restaurants, and travel destinations in ${cityName}, Korea.`,
+            containedInPlace: {
+              "@type": "Country",
+              name: "South Korea",
+            },
+          }),
+        }}
+      />
     </main>
   );
 }

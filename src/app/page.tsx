@@ -1,14 +1,26 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 const CITIES = [
-  { slug: "seoul", name: "Seoul", description: "Capital city with palaces, markets, and nightlife" },
-  { slug: "busan", name: "Busan", description: "Coastal city famous for beaches and seafood" },
-  { slug: "jeju", name: "Jeju", description: "Volcanic island with stunning natural scenery" },
-  { slug: "gyeongbuk", name: "Gyeongbuk", description: "Ancient capital with UNESCO heritage sites" },
-  { slug: "incheon", name: "Incheon", description: "Gateway city with Chinatown and islands" },
-  { slug: "daegu", name: "Daegu", description: "Cultural hub known for markets and temples" },
+  { slug: "seoul", name: "Seoul", description: "Capital city with palaces, markets, and nightlife", image: "https://images.unsplash.com/photo-1538485399081-7191377e8241?w=600&q=80" },
+  { slug: "busan", name: "Busan", description: "Coastal city famous for beaches and seafood", image: "https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=600&q=80" },
+  { slug: "jeju", name: "Jeju", description: "Volcanic island with stunning natural scenery", image: "https://images.unsplash.com/photo-1579169825527-5cc7bbb2e44c?w=600&q=80" },
+  { slug: "gyeongbuk", name: "Gyeongbuk", description: "Ancient capital with UNESCO heritage sites", image: "https://images.unsplash.com/photo-1553152531-b98a2fc8d3bf?w=600&q=80" },
+  { slug: "incheon", name: "Incheon", description: "Gateway city with Chinatown and islands", image: "https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=600&q=80" },
+  { slug: "daegu", name: "Daegu", description: "Cultural hub known for markets and temples", image: "https://images.unsplash.com/photo-1546874177-9e664107314e?w=600&q=80" },
+];
+
+const CATEGORIES = [
+  { slug: "attractions", label: "Attractions", icon: "🏛️", description: "Palaces, temples, landmarks" },
+  { slug: "restaurants", label: "Restaurants", icon: "🍜", description: "Korean cuisine & local food" },
+  { slug: "hotels", label: "Hotels", icon: "🏨", description: "Accommodation & stays" },
+  { slug: "festivals", label: "Festivals", icon: "🎊", description: "Events & celebrations" },
+  { slug: "culture", label: "Culture", icon: "🎭", description: "Museums, galleries, theaters" },
+  { slug: "shopping", label: "Shopping", icon: "🛍️", description: "Markets & shopping districts" },
+  { slug: "leisure", label: "Leisure", icon: "⛷️", description: "Activities & recreation" },
+  { slug: "courses", label: "Courses", icon: "🗺️", description: "Travel routes & itineraries" },
 ];
 
 export default function Home() {
@@ -20,7 +32,7 @@ export default function Home() {
           Korea Travel Guide
         </h1>
         <p className="mx-auto mb-8 max-w-2xl text-lg opacity-90">
-          Explore attractions, restaurants, festivals and travel destinations across Korea.
+          Explore 15,000+ attractions, restaurants, festivals, and travel destinations across South Korea.
         </p>
         <Link href="/en/seoul">
           <Button size="lg" variant="secondary" className="text-base font-semibold">
@@ -29,18 +41,29 @@ export default function Home() {
         </Link>
       </section>
 
-      {/* Popular Destinations */}
+      {/* Cities Grid */}
       <section className="mx-auto max-w-6xl px-4 py-16">
-        <h2 className="mb-8 text-center text-3xl font-bold">Popular Destinations</h2>
+        <h2 className="mb-2 text-center text-3xl font-bold">Popular Destinations</h2>
+        <p className="text-muted-foreground mb-8 text-center">Discover Korea&apos;s most visited cities and regions</p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {CITIES.map((city) => (
             <Link key={city.slug} href={`/en/${city.slug}`}>
-              <Card className="hover:bg-muted/50 h-full transition-colors">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold">{city.name}</h3>
-                  <p className="text-muted-foreground mt-1 text-sm">
-                    {city.description}
-                  </p>
+              <Card className="hover:bg-muted/50 group h-full overflow-hidden transition-colors">
+                <div className="relative aspect-video overflow-hidden">
+                  <Image
+                    src={city.image}
+                    alt={city.name}
+                    fill
+                    className="object-cover transition-transform group-hover:scale-105"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <h3 className="absolute bottom-3 left-3 text-xl font-bold text-white">
+                    {city.name}
+                  </h3>
+                </div>
+                <CardContent className="p-4">
+                  <p className="text-muted-foreground text-sm">{city.description}</p>
                 </CardContent>
               </Card>
             </Link>
@@ -48,8 +71,29 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Categories */}
+      <section className="bg-muted/30 px-4 py-16">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="mb-2 text-center text-3xl font-bold">Browse by Category</h2>
+          <p className="text-muted-foreground mb-8 text-center">Find exactly what you&apos;re looking for</p>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {CATEGORIES.map((cat) => (
+              <Link key={cat.slug} href={`/en/seoul/${cat.slug}`}>
+                <Card className="hover:bg-muted/50 h-full transition-colors">
+                  <CardContent className="p-5">
+                    <span className="mb-2 block text-2xl">{cat.icon}</span>
+                    <h3 className="font-semibold">{cat.label}</h3>
+                    <p className="text-muted-foreground mt-1 text-sm">{cat.description}</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Stats Section */}
-      <section className="bg-muted px-4 py-12 text-center">
+      <section className="px-4 py-16 text-center">
         <div className="mx-auto grid max-w-4xl gap-8 sm:grid-cols-3">
           <div>
             <p className="text-3xl font-bold">15,000+</p>
@@ -57,7 +101,7 @@ export default function Home() {
           </div>
           <div>
             <p className="text-3xl font-bold">17</p>
-            <p className="text-muted-foreground mt-1">Cities & Regions</p>
+            <p className="text-muted-foreground mt-1">Cities &amp; Regions</p>
           </div>
           <div>
             <p className="text-3xl font-bold">8</p>
@@ -66,6 +110,24 @@ export default function Home() {
         </div>
       </section>
 
+      {/* JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "Explore Korea",
+            url: "https://travel.in-book.co.kr",
+            description: "Data-driven Korea travel platform for international tourists. Discover attractions, restaurants, hotels, and festivals across South Korea.",
+            potentialAction: {
+              "@type": "SearchAction",
+              target: "https://travel.in-book.co.kr/en/seoul?q={search_term_string}",
+              "query-input": "required name=search_term_string",
+            },
+          }),
+        }}
+      />
     </main>
   );
 }

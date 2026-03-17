@@ -116,6 +116,16 @@ export async function getPlacesByCity(
   return result.rows;
 }
 
+/** Get all places for sitemap (slug, area_code, content_type_id, updated) */
+export async function getAllPlacesForSitemap(): Promise<
+  Pick<Place, "slug" | "area_code" | "content_type_id">[]
+> {
+  const result = await query(
+    `SELECT slug, area_code, content_type_id FROM places ORDER BY content_id`
+  );
+  return result.rows;
+}
+
 /** Count places by city and category */
 export async function countPlacesByCategory(
   areaCode: number,
