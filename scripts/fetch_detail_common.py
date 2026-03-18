@@ -32,9 +32,6 @@ def fetch_detail_common(limit: int | None = None):
         try:
             body = api_request("detailCommon2", {
                 "contentId": content_id,
-                "contentTypeId": content_type_id,
-                "defaultYN": "Y",
-                "overviewYN": "Y",
             })
         except QuotaExhaustedError as e:
             print(f"\n{e}")
