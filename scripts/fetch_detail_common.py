@@ -38,6 +38,12 @@ def fetch_detail_common(limit: int | None = None):
             print(f"  Saved {saved}/{len(places)} before quota ran out.")
             break
 
+        if not isinstance(body, dict):
+            if (i + 1) % 50 == 0:
+                print(f"  Processed {i + 1}/{len(places)}, saved {saved}")
+            time.sleep(1)
+            continue
+
         items = body.get("items", {}).get("item", [])
         if isinstance(items, dict):
             items = [items]
