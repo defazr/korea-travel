@@ -28,6 +28,7 @@ def fetch_detail_common(limit: int | None = None):
     print(f"Found {len(places)} places without details")
 
     saved = 0
+    skipped = []
     for i, (content_id, content_type_id) in enumerate(places):
         try:
             body = api_request("detailCommon2", {
@@ -39,8 +40,8 @@ def fetch_detail_common(limit: int | None = None):
             break
 
         if not isinstance(body, dict):
-            if (i + 1) % 50 == 0:
-                print(f"  Processed {i + 1}/{len(places)}, saved {saved}")
+            skipped.append(content_id)
+            print(f"  Skipped content_id={content_id} (invalid response)")
             time.sleep(1)
             continue
 
@@ -72,6 +73,8 @@ def fetch_detail_common(limit: int | None = None):
     cur.close()
     db.close()
     print(f"\nDone. Saved {saved}/{len(places)} places.")
+    if skipped:
+        print(f"Skipped {len(skipped)} items (will retry next run): {skipped[:20]}{'...' if len(skipped) > 20 else ''}")
 
 
 if __name__ == "__main__":
