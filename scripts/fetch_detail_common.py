@@ -42,14 +42,14 @@ def fetch_detail_common(limit: int | None = None):
         if not isinstance(body, dict):
             skipped.append(content_id)
             print(f"  Skipped content_id={content_id} (invalid response)")
-            time.sleep(1)
+            time.sleep(0.3)
             continue
 
         items_wrap = body.get("items", {})
         if not isinstance(items_wrap, dict):
             skipped.append(content_id)
             print(f"  Skipped content_id={content_id} (items not dict)")
-            time.sleep(1)
+            time.sleep(0.3)
             continue
 
         items = items_wrap.get("item", [])
@@ -75,7 +75,7 @@ def fetch_detail_common(limit: int | None = None):
         if (i + 1) % 50 == 0:
             print(f"  Processed {i + 1}/{len(places)}, saved {saved}")
 
-        time.sleep(1)  # Rate limiting — 1 req/sec
+        time.sleep(0.3)  # Rate limiting — operational account
 
     cur.close()
     db.close()
@@ -86,6 +86,6 @@ def fetch_detail_common(limit: int | None = None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--limit", type=int, help="Max places to process")
+    parser.add_argument("--limit", type=int, default=2000, help="Max places to process (default: 2000)")
     args = parser.parse_args()
     fetch_detail_common(args.limit)
