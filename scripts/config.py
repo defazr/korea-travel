@@ -46,9 +46,9 @@ def get_db():
 
 
 def to_slug(title: str) -> str:
-    """Convert title to URL-friendly slug."""
+    """Convert title to URL-friendly slug (ASCII only)."""
     slug = title.lower().strip()
-    slug = re.sub(r"[^\w\s-]", "", slug)
+    slug = re.sub(r"[^a-z0-9\s-]", "", slug)
     slug = re.sub(r"\s+", "-", slug)
     slug = re.sub(r"-+", "-", slug)
     slug = slug.strip("-")
