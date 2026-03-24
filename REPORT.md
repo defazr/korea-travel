@@ -1,6 +1,6 @@
 # Korea Travel Data Platform — 프로젝트 현황 보고서
 
-> **작성일**: 2026-03-17
+> **작성일**: 2026-03-17 (최종 업데이트: 2026-03-24)
 > **Repository**: https://github.com/defazr/korea-travel
 > **도메인**: https://travel.in-book.co.kr
 > **브랜치**: `claude/add-github-repo-url-knsbO`
@@ -55,7 +55,7 @@
 | `src/lib/constants.ts` 업데이트 | ✅ 완료 | 75→courses, 76→attractions, 79→shopping, 82→restaurants, 85→festivals |
 | `scripts/config.py` 업데이트 | ✅ 완료 | 동일 매핑 + QuotaExhaustedError 추가 |
 | `CLAUDE.md` 업데이트 | ✅ 완료 | EngService2 매핑 테이블 반영 |
-| 크롤러 개선 | ✅ 완료 | quota 감지 자동중단, sleep 1초 |
+| 크롤러 개선 | ✅ 완료 | quota 감지 자동중단 |
 | 카테고리 페이지 구현 | ✅ 완료 | 메타데이터, breadcrumb, JSON-LD 포함 |
 | SEO 인프라 (robots.ts, sitemap.ts) | ✅ 완료 | 6개 라우트 |
 | Next.js 빌드 | ✅ 성공 | 에러 없이 완료 |
@@ -169,6 +169,7 @@ is_main     BOOLEAN
 ## 9. Git 커밋 히스토리
 
 ```
+8021a2a  Tune crawler for operational account: sleep 0.3, default limit 2000
 5646fa4  feat: add SEO infrastructure and category pages (Phase 2)
 a9f7545  feat: improve UI for TourAPI operational account application
 54fdf63  chore: add logs/ and __pycache__/ to .gitignore
@@ -236,18 +237,29 @@ korea-travel/
 
 ---
 
+### Phase 3 — 운영계정 승인 & 크롤러 튜닝 (2026-03-24)
+
+| 작업 | 상태 | 비고 |
+|------|------|------|
+| data.go.kr 운영계정 승인 | ✅ 완료 | 일일 호출 한도 상향 |
+| 크롤러 sleep 튜닝 | ✅ 완료 | 1초 → 0.3초 |
+| 기본 limit 설정 | ✅ 완료 | default 2000건/회 |
+| 크론 자동 수집 설정 | ✅ 완료 | 매일 KST 01:00 실행 |
+| detail 수집 (6,613/15,272) | 🔄 진행 중 | 4~5일 후 완료 예상 |
+
+---
+
 ## 11. 남은 작업 (TODO)
 
 ### 즉시 실행 가능
 
 | 우선순위 | 작업 | 명령어/방법 |
 |:---:|------|-------------|
-| 🔴 | data.go.kr 운영계정 신청 | 웹사이트에서 일일 50,000건 상향 신청 |
-| 🔴 | Detail 크롤링 실행 | `python3 scripts/fetch_detail_common.py` |
+| 🔴 | Detail 크롤링 완료 대기 | 크론 자동 실행 중 (하루 2,000건) |
 | 🔴 | Intro 크롤링 실행 | `python3 scripts/fetch_detail_intro.py` |
 | 🔴 | Image 크롤링 실행 | `python3 scripts/fetch_images.py` |
 
-> ⚠️ API 할당량 리셋 후 순서대로 실행. quota 소진 시 자동 중단되므로 다음날 재실행.
+> ⚠️ detail 수집 완료 후 intro → image 순서로 진행.
 
 ### 향후 계획
 
@@ -288,4 +300,4 @@ korea-travel/
 
 ---
 
-*이 보고서는 2026년 3월 17일 기준 프로젝트 현황을 반영합니다.*
+*이 보고서는 2026년 3월 24일 기준 프로젝트 현황을 반영합니다.*

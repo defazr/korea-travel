@@ -91,6 +91,26 @@ Store only image_url — do not download images.
 
 Each place page shows nearby attractions, restaurants, hotels within 5km radius using mapx/mapy coordinates.
 
+## Crawler Settings (2026-03-24)
+
+- **Account**: data.go.kr 운영계정 승인 완료
+- **API Service**: EngService2 (영문 관광정보서비스_GW)
+- **Sleep**: 0.3s (operational account)
+- **Default limit**: 2000 per cron run
+- **Cron schedule**: `0 16 * * *` (UTC 16:00 = KST 01:00, daily)
+- **Cron command**: `cd /var/www/korea-travel && git pull && cd scripts && python3 fetch_detail_common.py`
+- **Safety**: QuotaExhaustedError on 429 → auto-stop
+- **Progress check**: `진행률` alias on server
+
+### Data Collection Status (2026-03-24)
+
+| 항목 | 수치 |
+|------|------|
+| 전체 places | 15,272 |
+| detail 수집완료 | 6,613 |
+| 남은 건수 | 8,659 |
+| 예상 완료 | 4~5일 (하루 2,000건) |
+
 ## Data Volume
 
 - Initial launch: 3,000–5,000 pages
