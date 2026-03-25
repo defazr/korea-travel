@@ -20,7 +20,7 @@ Automatically generates thousands of pages using Korea Tourism Organization Tour
 - **Data Crawler**: Python 3
 - **Server**: Vultr (Ubuntu 22.04, 1 vCPU, 2GB RAM, 64GB NVMe)
 - **Process Manager**: PM2
-- **Reverse Proxy**: Nginx
+- **Reverse Proxy**: Apache (mod_proxy)
 - **Map**: OpenStreetMap (iframe embed)
 - **Icons**: Lucide React
 
@@ -29,7 +29,7 @@ Automatically generates thousands of pages using Korea Tourism Organization Tour
 - IP: 141.164.41.235
 - App path: /var/www/korea-travel
 - Next.js runs on port 3000 (PM2, fork mode)
-- Nginx proxies external traffic to localhost:3000
+- Apache proxies external traffic to localhost:3000 (no Nginx installed)
 - DB: PostgreSQL on localhost:5432, database `korea_travel`, user `postgres`
 
 ## Domain Strategy
@@ -96,9 +96,11 @@ korea-travel/
 `/[lang]/[city]/[category]/[slug]`
 
 Examples:
-- /en/seoul/attractions/gyeongbokgung-palace
-- /en/seoul/restaurants/myeongdong-kyoja
-- /en/busan/festivals/busan-international-film-festival
+- /en/seoul/attractions/gyeongbokgung-palace-264337
+- /en/seoul/restaurants/myeongdong-kyoja-774785
+- /en/busan/festivals/busan-international-film-festival-900170
+
+**Important**: Slug always includes content_id suffix (e.g. `gyeongbokgung-palace-264337`, NOT `gyeongbokgung-palace`).
 
 ### Routing Flow
 
@@ -214,14 +216,15 @@ Korea Tourism Organization TourAPI
 - Safety: QuotaExhaustedError on 429 → auto-stop
 - Progress check: `진행률` alias on server
 
-### Data Collection Status (2026-03-24)
+### Data Collection Status (2026-03-25)
 
 | 항목 | 수치 |
 |------|------|
 | 전체 places | 15,272 |
-| detail 수집완료 | 6,613 |
-| 남은 건수 | 8,659 |
-| 예상 완료 | 4~5일 (하루 2,000건) |
+| detail 수집완료 | 7,501 |
+| 남은 건수 | 7,771 |
+| 실제 일일 수집량 | ~900건 (quota 제한, 설정은 2000이지만 ~900에서 소진) |
+| 예상 완료 | 8~9일 |
 
 ## Image Strategy
 
@@ -267,33 +270,22 @@ psql -U postgres -d korea_travel -h 127.0.0.1
 
 ---
 
-## Active Debugging Log
+## Resolved Issues
 
-### 404 Issue Investigation (2026-03-24)
+### 404 Issue — RESOLVED (2026-03-25)
 
 **Problem**: Some place pages returning 404 when accessed externally.
 
-**Findings so far**:
-1. DB has the data — `SELECT slug FROM places WHERE content_id = 3078595` returns `bukhansan-dulle-trail-section-1-1-3078595`
-2. `curl localhost:3000/en/seoul/courses/bukhansan-dulle-trail-section-1-1-3078595` returns **200** — Next.js app works fine
-3. PM2 logs show no DB connection errors, only Unsplash image 404s
-4. `.env` is correctly configured on server
-5. `getPlaceBySlug()` has NO try/catch — DB errors would throw (500), not return null (404)
-6. Page component does NOT validate city/category params — only slug matters
+**Root cause**: Not a bug. Slug format includes content_id suffix.
+- `gyeongbokgung-palace` → 404 (incomplete slug)
+- `gyeongbokgung-palace-264337` → 200 (correct slug with content_id)
 
-**Suspected cause**: Nginx reverse proxy configuration issue.
-- Nginx config file not found at `/etc/nginx/sites-enabled/korea-travel*`
-- Need to check: `ls /etc/nginx/sites-enabled/` and actual Nginx config
-- External HTTPS access (travel.in-book.co.kr) may not be proxying correctly to localhost:3000
+**Server investigation results**:
+- Nginx is NOT installed on this server
+- Apache is the sole reverse proxy (80 + 443 → localhost:3000)
+- Apache proxy works correctly — external and localhost both return 200 with correct slug
+- DB, PM2, Next.js all functioning normally
 
-**Next steps**:
-1. Find and check Nginx config: `ls /etc/nginx/sites-enabled/`
-2. Test external URL: `curl -s -o /dev/null -w "%{http_code}\n" https://travel.in-book.co.kr/en/seoul/courses/bukhansan-dulle-trail-section-1-1-3078595`
-3. Check Nginx error log: `tail -50 /var/log/nginx/error.log`
-4. If Nginx issue, fix proxy_pass config to properly forward all paths to Next.js
-
-**Ruled out**:
-- DB connection wrong (200 on localhost confirms DB works)
-- slug mismatch (verified in DB)
-- try/catch hiding errors (no try/catch in getPlaceBySlug)
-- ISR cache (low probability, localhost works)
+**Verified**:
+- `curl localhost:3000/en/seoul/attractions/gyeongbokgung-palace-264337` → 200
+- `curl https://travel.in-book.co.kr/en/seoul/attractions/gyeongbokgung-palace-264337` → 200
