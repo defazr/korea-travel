@@ -60,7 +60,7 @@ def fetch_images(limit: int | None = None):
         if (i + 1) % 50 == 0:
             print(f"  Processed {i + 1}/{len(places)}, saved {saved}")
 
-        time.sleep(1)
+        time.sleep(0.3)  # Rate limiting — operational account
 
     cur.close()
     db.close()
@@ -69,6 +69,6 @@ def fetch_images(limit: int | None = None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--limit", type=int, help="Max places to process")
+    parser.add_argument("--limit", type=int, default=2000, help="Max places to process (default: 2000)")
     args = parser.parse_args()
     fetch_images(args.limit)
