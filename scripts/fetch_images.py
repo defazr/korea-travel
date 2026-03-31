@@ -34,7 +34,6 @@ def fetch_images(limit: int | None = None):
             body = api_request("detailImage2", {
                 "contentId": content_id,
                 "imageYN": "Y",
-                "subImageYN": "Y",
             })
         except QuotaExhaustedError as e:
             print(f"\n{e}")
