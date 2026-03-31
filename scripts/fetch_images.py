@@ -40,23 +40,13 @@ def fetch_images(limit: int | None = None):
             print(f"  Saved {saved}/{len(places)} before quota ran out.")
             break
 
-        # Debug: log first 3 responses to see API structure
-        if i < 3:
-            print(f"  DEBUG content_id={content_id}: items type={type(body.get('items')).__name__}, body keys={list(body.keys())[:5]}")
-
         items_wrap = body.get("items", {})
         if not isinstance(items_wrap, dict):
-            no_images += 1
-            db.commit()
-            saved += 1
-            if (i + 1) % 50 == 0:
-                print(f"  Processed {i + 1}/{len(places)}, saved {saved}, images {images_total}, no_images {no_images}")
-            time.sleep(0.3)
-            continue
-
-        items = items_wrap.get("item", [])
-        if isinstance(items, dict):
-            items = [items]
+            items = []
+        else:
+            items = items_wrap.get("item", [])
+            if isinstance(items, dict):
+                items = [items]
 
         count = 0
         for j, item in enumerate(items):
@@ -71,8 +61,14 @@ def fetch_images(limit: int | None = None):
             """, (content_id, image_url, j == 0))
             count += 1
 
+        # Mark places with no images so they don't get re-fetched
         if count == 0:
             no_images += 1
+            cur.execute("""
+                INSERT INTO place_images (content_id, image_url, is_main)
+                VALUES (%s, 'none', FALSE)
+                ON CONFLICT DO NOTHING
+            """, (content_id,))
         images_total += count
         db.commit()
         saved += 1

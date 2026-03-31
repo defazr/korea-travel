@@ -53,7 +53,7 @@ export async function getPlaceDetails(
 /** Get place images */
 export async function getPlaceImages(contentId: number): Promise<PlaceImage[]> {
   const result = await query(
-    "SELECT * FROM place_images WHERE content_id = $1 ORDER BY is_main DESC",
+    "SELECT * FROM place_images WHERE content_id = $1 AND image_url != 'none' ORDER BY is_main DESC",
     [contentId]
   );
   return result.rows;
