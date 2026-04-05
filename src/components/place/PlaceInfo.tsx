@@ -19,8 +19,6 @@ export default function PlaceInfo({
   parking,
   useTime,
 }: PlaceInfoProps) {
-  const hasAnyInfo = overview || tel || homepage || openTime || restDate || parking || useTime;
-
   return (
     <section className="mb-8 space-y-6">
       {overview ? (
@@ -40,27 +38,25 @@ export default function PlaceInfo({
         </div>
       )}
 
-      {hasAnyInfo && (tel || homepage || openTime || restDate || parking || useTime) && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Information</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-3 sm:grid-cols-2">
-            {tel && <InfoRow label="Phone" value={tel} />}
-            {homepage && (
-              <InfoRow
-                label="Website"
-                value={homepage}
-                isHtml
-              />
-            )}
-            {openTime && <InfoRow label="Hours" value={openTime} isHtml />}
-            {restDate && <InfoRow label="Closed" value={restDate} isHtml />}
-            {parking && <InfoRow label="Parking" value={parking} isHtml />}
-            {useTime && <InfoRow label="Fee" value={useTime} isHtml />}
-          </CardContent>
-        </Card>
-      )}
+      <Card>
+        <CardHeader>
+          <CardTitle>Information</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-3 sm:grid-cols-2">
+          <InfoRow label="Phone" value={tel || "Information not available"} />
+          {homepage && (
+            <InfoRow
+              label="Website"
+              value={homepage}
+              isHtml
+            />
+          )}
+          <InfoRow label="Hours" value={openTime || "Information not available"} isHtml={!!openTime} />
+          <InfoRow label="Closed" value={restDate || "Information not available"} isHtml={!!restDate} />
+          <InfoRow label="Parking" value={parking || "Information not available"} isHtml={!!parking} />
+          <InfoRow label="Fee" value={useTime || "Information not available"} isHtml={!!useTime} />
+        </CardContent>
+      </Card>
     </section>
   );
 }

@@ -5,7 +5,7 @@ Usage: python3 scripts/fetch_detail_intro.py [--limit 100]
 
 import argparse
 import time
-from config import get_db, api_request, QuotaExhaustedError
+from config import get_db, api_request, QuotaExhaustedError, SKIP_CONTENT_IDS
 
 
 def fetch_detail_intro(limit: int | None = None):
@@ -18,11 +18,12 @@ def fetch_detail_intro(limit: int | None = None):
         FROM places p
         JOIN place_details pd ON p.content_id = pd.content_id
         WHERE pd.open_time IS NULL AND pd.use_time IS NULL
+          AND p.content_id != ALL(%s)
     """
     if limit:
         query += f" LIMIT {limit}"
 
-    cur.execute(query)
+    cur.execute(query, (list(SKIP_CONTENT_IDS),))
     places = cur.fetchall()
     print(f"Found {len(places)} places without intro details")
 

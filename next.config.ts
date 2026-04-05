@@ -11,10 +11,6 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "tong.visitkorea.or.kr",
       },
-      {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
     ],
   },
 };
