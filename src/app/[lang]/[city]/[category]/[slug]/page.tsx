@@ -6,6 +6,7 @@ import {
   getPlaceDetails,
   getPlaceImages,
   getNearbyPlaces,
+  getRelatedByCategory,
 } from "@/lib/queries";
 import { CONTENT_TYPE_MAP, AREA_CODE_MAP } from "@/lib/constants";
 import { PLACEHOLDER_IMAGE } from "@/lib/image";
@@ -13,6 +14,7 @@ import PlaceHero from "@/components/place/PlaceHero";
 import PlaceInfo from "@/components/place/PlaceInfo";
 import PlaceMap from "@/components/place/PlaceMap";
 import NearbySection from "@/components/place/NearbySection";
+import RelatedCategorySection from "@/components/place/RelatedCategorySection";
 
 export const revalidate = 3600;
 
@@ -52,10 +54,11 @@ export default async function PlacePage({ params }: PageProps) {
   const place = await getPlaceBySlug(slug);
   if (!place) notFound();
 
-  const [details, images, nearby] = await Promise.all([
+  const [details, images, nearby, related] = await Promise.all([
     getPlaceDetails(place.content_id),
     getPlaceImages(place.content_id),
     getNearbyPlaces(place.mapx, place.mapy, 5, place.content_id, 6),
+    getRelatedByCategory(place.area_code, place.content_type_id, place.content_id, 6),
   ]);
 
   const resolvedCategory = CONTENT_TYPE_MAP[place.content_type_id] || "attractions";
@@ -100,11 +103,26 @@ export default async function PlacePage({ params }: PageProps) {
         <PlaceMap lat={place.mapy} lng={place.mapx} title={place.title} />
       )}
 
+      <RelatedCategorySection places={related} categoryLabel={categoryLabel} cityName={cityName} />
+
       {nearby.length > 0 && <NearbySection places={nearby} />}
 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://travel.in-book.co.kr/" },
+            { "@type": "ListItem", "position": 2, "name": cityName, "item": `https://travel.in-book.co.kr/${lang}/${city}` },
+            { "@type": "ListItem", "position": 3, "name": categoryLabel, "item": `https://travel.in-book.co.kr/${lang}/${city}/${resolvedCategory}` },
+            { "@type": "ListItem", "position": 4, "name": place.title },
+          ],
+        }) }}
       />
     </main>
   );

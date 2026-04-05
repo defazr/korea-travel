@@ -126,6 +126,23 @@ export async function getAllPlacesForSitemap(): Promise<
   return result.rows;
 }
 
+/** Get related places in the same category (excluding current place) */
+export async function getRelatedByCategory(
+  areaCode: number,
+  contentTypeId: number,
+  excludeContentId: number,
+  limit = 6
+): Promise<Place[]> {
+  const result = await query(
+    `SELECT * FROM places
+     WHERE area_code = $1 AND content_type_id = $2 AND content_id != $3
+     ORDER BY RANDOM()
+     LIMIT $4`,
+    [areaCode, contentTypeId, excludeContentId, limit]
+  );
+  return result.rows;
+}
+
 /** Count places by city and category */
 export async function countPlacesByCategory(
   areaCode: number,
