@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 const CITIES = [
-  { slug: "seoul", name: "Seoul", description: "Capital city with palaces, markets, and nightlife", image: "https://images.unsplash.com/photo-1538485399081-7191377e8241?w=600&q=80" },
-  { slug: "busan", name: "Busan", description: "Coastal city famous for beaches and seafood", image: "https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=600&q=80" },
-  { slug: "jeju", name: "Jeju", description: "Volcanic island with stunning natural scenery", image: "https://images.unsplash.com/photo-1579169825527-5cc7bbb2e44c?w=600&q=80" },
-  { slug: "gyeongbuk", name: "Gyeongbuk", description: "Ancient capital with UNESCO heritage sites", image: "https://images.unsplash.com/photo-1553152531-b98a2fc8d3bf?w=600&q=80" },
-  { slug: "incheon", name: "Incheon", description: "Gateway city with Chinatown and islands", image: "https://images.unsplash.com/photo-1517154421773-0529f29ea451?w=600&q=80" },
-  { slug: "daegu", name: "Daegu", description: "Cultural hub known for markets and temples", image: "https://images.unsplash.com/photo-1546874177-9e664107314e?w=600&q=80" },
+  { slug: "seoul", name: "Seoul", description: "Capital city with palaces, markets, and nightlife", image: "http://tong.visitkorea.or.kr/cms/resource/44/3109344_image2_1.JPG" },
+  { slug: "busan", name: "Busan", description: "Coastal city famous for beaches and seafood", image: "http://tong.visitkorea.or.kr/cms/resource/44/1605344_image2_1.jpg" },
+  { slug: "jeju", name: "Jeju", description: "Volcanic island with stunning natural scenery", image: "http://tong.visitkorea.or.kr/cms/resource/13/2525613_image2_1.jpg" },
+  { slug: "gyeongbuk", name: "Gyeongbuk", description: "Ancient capital with UNESCO heritage sites", image: "http://tong.visitkorea.or.kr/cms/resource/55/3082355_image2_1.jpg" },
+  { slug: "incheon", name: "Incheon", description: "Gateway city with Chinatown and islands", image: "http://tong.visitkorea.or.kr/cms/resource/09/2674909_image2_1.jpg" },
+  { slug: "daegu", name: "Daegu", description: "Cultural hub known for markets and temples", image: "http://tong.visitkorea.or.kr/cms/resource/57/1573857_image2_1.jpg" },
 ];
 
 const CATEGORIES = [
