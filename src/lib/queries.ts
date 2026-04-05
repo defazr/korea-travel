@@ -69,7 +69,7 @@ export async function getPlacesByCategory(
   const result = await query(
     `SELECT * FROM places
      WHERE area_code = $1 AND content_type_id = $2
-     ORDER BY title
+     ORDER BY (first_image IS NOT NULL) DESC, title
      LIMIT $3 OFFSET $4`,
     [areaCode, contentTypeId, limit, offset]
   );
