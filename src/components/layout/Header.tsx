@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, ChevronDown } from "lucide-react";
+import SearchBox from "./SearchBox";
 
 const TOP_CITIES = [
   { slug: "seoul", name: "Seoul" },
@@ -92,6 +93,7 @@ export default function Header() {
               {city.name}
             </Link>
           ))}
+          <SearchBox />
           <div ref={dropdownRef} className="relative">
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -149,6 +151,9 @@ export default function Header() {
       {/* Mobile drawer */}
       {mobileOpen && (
         <div className="md:hidden border-t bg-white px-4 py-4">
+          <div className="mb-4">
+            <SearchBox />
+          </div>
           <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">Major Cities</p>
           <div className="grid grid-cols-2 gap-1 mb-4">
             {MAJOR_CITIES.map((city) => (
