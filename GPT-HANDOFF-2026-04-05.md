@@ -128,6 +128,25 @@ Claude Code 터미널 첫 세션. 데이터 파이프라인 완성 + SEO 기반 
 - `CREATE EXTENSION pg_trgm`
 - `CREATE INDEX idx_places_title_trgm ON places USING gin (title gin_trgm_ops)`
 - `UPDATE places SET area_code = ... WHERE area_code IS NULL` (5,258건)
+- `UPDATE places SET first_image = ... WHERE first_image IS NULL` (732건, place_images 기반)
+
+### 세션 후반 추가 작업
+- canonical URL 전 페이지 적용 (metadataBase + alternates)
+- Footer 저작권 표시 (© 2026)
+- GSC 등록 + 색인 요청 4개 URL
+- GSC 등록 전 QA 완료 (404, redirect, meta, robots, canonical 전부 정상)
+
+---
+
+## 현재 Phase: 인덱싱 대기
+
+GSC 등록 완료. **코드 수정 금지 구간.**
+
+- Day 1~3: Discovered/Crawled
+- Day 3~7: 일부 index, impressions
+- Day 7~14: CTR 데이터 → title/description 최적화 시작
+
+**다음 행동**: GSC 매일 체크, 데이터 기록, 아무것도 건드리지 않기
 
 ---
 
