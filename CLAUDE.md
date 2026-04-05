@@ -205,26 +205,59 @@ Korea Tourism Organization TourAPI
 - Language: English API first (EngService2)
 - Key identifier: contentId (shared across languages)
 
-## Crawler Settings (2026-03-24)
+## Crawler Settings
 
 - Account: data.go.kr 운영계정 승인 완료
 - API Service: EngService2 (영문 관광정보서비스_GW)
 - Sleep: 0.3s (operational account)
 - Default limit: 2000 per cron run
 - Cron: `0 16 * * *` (UTC 16:00 = KST 01:00, daily)
-- Cron cmd: `cd /var/www/korea-travel && git pull && cd scripts && python3 fetch_detail_common.py`
 - Safety: QuotaExhaustedError on 429 → auto-stop
-- Progress check: `진행률` alias on server
+- 실제 일일 수집량: ~900건 (quota 제한, 설정은 2000이지만 ~900에서 소진)
 
-### Data Collection Status (2026-03-25)
+### EngService2 Parameter Notes
 
-| 항목 | 수치 |
-|------|------|
-| 전체 places | 15,272 |
-| detail 수집완료 | 7,501 |
-| 남은 건수 | 7,771 |
-| 실제 일일 수집량 | ~900건 (quota 제한, 설정은 2000이지만 ~900에서 소진) |
-| 예상 완료 | 8~9일 |
+EngService2 does NOT support several parameters that KorService does:
+- `detailCommon2`: Do NOT pass `contentTypeId`, `defaultYN`, `overviewYN`
+- `detailImage2`: Do NOT pass `subImageYN`
+- `detailIntro2`: **May need testing** — check if `contentTypeId` works (it's required per docs but verify)
+
+### Data Collection Status (2026-04-05)
+
+| Step | Script | Status |
+|------|--------|--------|
+| 1. Place list | fetch_area_list.py | ✅ COMPLETE (15,272 places) |
+| 2. Detail common | fetch_detail_common.py | ✅ COMPLETE (overview, homepage) |
+| 3. Images | fetch_images.py | ✅ COMPLETE (place_images populated) |
+| 4. Detail intro | fetch_detail_intro.py | ⏳ NEXT (open_time, rest_date, parking, use_time) |
+
+### Cron Job — NEEDS UPDATE
+
+Current cron runs `fetch_images.py` (completed). Switch to `fetch_detail_intro.py`:
+
+```bash
+# Current (OUTDATED):
+0 16 * * * cd /var/www/korea-travel && git pull origin claude/add-github-repo-url-knsbO >> /var/log/korea-travel-cron.log 2>&1 && cd scripts && python3 fetch_images.py >> /var/log/korea-travel-cron.log 2>&1
+
+# New (switch to detail_intro):
+0 16 * * * cd /var/www/korea-travel && git pull >> /var/log/korea-travel-cron.log 2>&1 && cd scripts && python3 fetch_detail_intro.py >> /var/log/korea-travel-cron.log 2>&1
+```
+
+To update: `crontab -e` on server and replace the line.
+
+### Server Aliases (~/.bashrc)
+
+```bash
+alias 진행률='sudo -u postgres psql -d korea_travel -c "SELECT (SELECT COUNT(*) FROM place_images) as images, (SELECT COUNT(*) FROM place_details) as details, (SELECT COUNT(*) FROM places) as total"'
+alias 로그='tail -10 /var/log/korea-travel-cron.log'
+alias 남은거='sudo -u postgres psql -d korea_travel -c "SELECT COUNT(*) FROM places p LEFT JOIN place_images pi ON p.content_id = pi.content_id WHERE pi.content_id IS NULL"'
+```
+
+### Known Issues in Crawlers
+
+- 148 content_ids permanently return broken responses from detailCommon2 — excluded in `SKIP_CONTENT_IDS` set in `fetch_detail_common.py`
+- Places with no images get a `'none'` marker row in place_images to prevent re-fetching
+- `queries.ts` filters these out: `WHERE image_url != 'none'`
 
 ## Image Strategy
 
@@ -289,3 +322,15 @@ psql -U postgres -d korea_travel -h 127.0.0.1
 **Verified**:
 - `curl localhost:3000/en/seoul/attractions/gyeongbokgung-palace-264337` → 200
 - `curl https://travel.in-book.co.kr/en/seoul/attractions/gyeongbokgung-palace-264337` → 200
+
+---
+
+## Next Steps (2026-04-05)
+
+Priority order:
+
+1. **Switch cron to fetch_detail_intro.py** — images are done, now collect open_time/rest_date/parking/use_time
+2. **Test fetch_detail_intro.py** — may need EngService2 parameter fixes (like detailCommon2 and detailImage2 needed). Run manually first: `cd /var/www/korea-travel/scripts && python3 fetch_detail_intro.py --limit 10`
+3. **Rebuild Next.js** after intro data is collected: `cd /var/www/korea-travel && npm run build && pm2 restart korea-travel`
+4. **Google Search Console** — submit sitemap.xml
+5. **Production domain** — migrate to explorekorea.com with 301 redirects
