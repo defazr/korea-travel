@@ -60,7 +60,7 @@ export default function Footer() {
         </div>
         <div className="border-t pt-6 text-center">
           <p className="text-muted-foreground text-xs">
-            &copy; 2025 travel.in-book.co.kr
+            &copy; 2026 travel.in-book.co.kr
           </p>
           <p className="text-muted-foreground text-xs mt-1">
             Data powered by Korea Tourism Organization TourAPI
