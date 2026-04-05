@@ -34,16 +34,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const cityName = city.charAt(0).toUpperCase() + city.slice(1);
   const address = [place.addr1, place.addr2].filter(Boolean).join(" ");
+  const category = CONTENT_TYPE_MAP[place.content_type_id] || "attractions";
+  const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
+  const details = await getPlaceDetails(place.content_id);
+  const overview = details?.overview?.replace(/<[^>]*>/g, "").trim();
+
+  const description =
+    overview && overview.length > 50
+      ? `${place.title} in ${cityName}. ${overview.slice(0, 120)}`
+      : `Visit ${place.title} (${categoryLabel}) in ${cityName}, Korea. ${address || "Discover travel information, photos, and nearby attractions."}`;
 
   return {
-    title: `${place.title} – Korea Travel Guide`,
-    description: address
-      ? `Visit ${place.title} in ${cityName}, Korea. ${address}`
-      : `Visit ${place.title} in ${cityName}, Korea. Discover travel information, photos, and nearby attractions.`,
+    title: `${place.title} in ${cityName} – Korea Travel Guide`,
+    description,
     openGraph: {
-      title: `${place.title} – Korea Travel Guide`,
-      description: `Visit ${place.title} in ${cityName}, Korea.`,
-      images: place.first_image ? [place.first_image] : undefined,
+      title: `${place.title} in ${cityName} – Korea Travel Guide`,
+      description: `Visit ${place.title} (${categoryLabel}) in ${cityName}, Korea.`,
+      images: [place.first_image || PLACEHOLDER_IMAGE],
     },
   };
 }
