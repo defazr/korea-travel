@@ -34,9 +34,15 @@ const REGIONS = [
   { slug: "jeju", name: "Jeju" },
 ];
 
+interface MarketData {
+  usdKrw: number | null;
+  btcUsd: number | null;
+}
+
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [market, setMarket] = useState<MarketData | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,8 +55,27 @@ export default function Header() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    fetch("/api/market")
+      .then((res) => res.json())
+      .then((data) => setMarket(data))
+      .catch(() => {});
+  }, []);
+
   return (
     <header className="border-b bg-white sticky top-0 z-50">
+      {market && (market.usdKrw || market.btcUsd) && (
+        <div className="bg-muted/50 border-b text-xs">
+          <div className="mx-auto flex max-w-6xl items-center justify-end gap-4 px-4 py-1 text-muted-foreground">
+            {market.usdKrw && (
+              <span>$1 = ₩{Math.round(market.usdKrw).toLocaleString()}</span>
+            )}
+            {market.btcUsd && (
+              <span>BTC ${(market.btcUsd / 1000).toFixed(1)}K</span>
+            )}
+          </div>
+        </div>
+      )}
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link href="/" className="text-lg font-bold">
           Explore Korea
