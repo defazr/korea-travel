@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X, ChevronDown } from "lucide-react";
 import SearchBox from "./SearchBox";
 
@@ -45,6 +46,13 @@ export default function Header() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [market, setMarket] = useState<MarketData | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  // Close menus on route change
+  useEffect(() => {
+    setMobileOpen(false);
+    setDropdownOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
