@@ -28,7 +28,7 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { city, slug } = await params;
+  const { lang, city, category: categoryParam, slug } = await params;
   const place = await getPlaceBySlug(slug);
   if (!place) return {};
 
@@ -47,6 +47,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `${place.title} in ${cityName} – Korea Travel Guide`,
     description,
+    alternates: {
+      canonical: `/${lang}/${city}/${categoryParam}/${slug}`,
+    },
     openGraph: {
       title: `${place.title} in ${cityName} – Korea Travel Guide`,
       description: `Visit ${place.title} (${categoryLabel}) in ${cityName}, Korea.`,

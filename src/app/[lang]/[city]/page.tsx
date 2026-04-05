@@ -22,12 +22,15 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { city } = await params;
+  const { lang, city } = await params;
   const cityName = city.charAt(0).toUpperCase() + city.slice(1);
 
   return {
     title: `Things to Do in ${cityName} – Korea Travel Guide`,
     description: `Discover attractions, restaurants, and travel destinations in ${cityName}, Korea.`,
+    alternates: {
+      canonical: `/${lang}/${city}`,
+    },
     openGraph: {
       title: `Things to Do in ${cityName} – Korea Travel Guide`,
       description: `Discover attractions, restaurants, and travel destinations in ${cityName}, Korea.`,

@@ -26,13 +26,16 @@ interface PageProps {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { city, category } = await params;
+  const { lang, city, category } = await params;
   const cityName = city.charAt(0).toUpperCase() + city.slice(1);
   const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
 
   return {
     title: `${categoryName} in ${cityName} – Korea Travel Guide`,
     description: `Discover the best ${category} in ${cityName}, South Korea. Browse ${category} with photos, addresses, and travel information.`,
+    alternates: {
+      canonical: `/${lang}/${city}/${category}`,
+    },
     openGraph: {
       title: `${categoryName} in ${cityName} – Korea Travel Guide`,
       description: `Discover the best ${category} in ${cityName}, South Korea.`,

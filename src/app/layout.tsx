@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import ScrollToTop from "@/components/layout/ScrollToTop";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://travel.in-book.co.kr"),
   title: "Explore Korea — Travel Guide for International Tourists",
   description:
     "Discover attractions, restaurants, hotels, and festivals across South Korea. Data-driven travel platform powered by Korea Tourism Organization.",
