@@ -101,7 +101,9 @@ export default function Header() {
               {city.name}
             </Link>
           ))}
-          <SearchBox />
+          <div className="w-48 lg:w-56">
+            <SearchBox />
+          </div>
           <div ref={dropdownRef} className="relative">
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}

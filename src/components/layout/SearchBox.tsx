@@ -18,6 +18,7 @@ export default function SearchBox() {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   // Debounced search
@@ -64,19 +65,23 @@ export default function SearchBox() {
 
   return (
     <div ref={containerRef} className="relative">
-      <div className="flex items-center gap-2 rounded-md border bg-muted/30 px-3 py-1.5">
+      <div
+        className="flex items-center gap-2 rounded-md border bg-muted/30 px-3 py-1.5 cursor-text"
+        onClick={() => inputRef.current?.focus()}
+      >
         {loading ? (
-          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          <Loader2 className="h-4 w-4 shrink-0 animate-spin text-muted-foreground pointer-events-none" />
         ) : (
-          <Search className="h-4 w-4 text-muted-foreground" />
+          <Search className="h-4 w-4 shrink-0 text-muted-foreground pointer-events-none" />
         )}
         <input
+          ref={inputRef}
           type="text"
           placeholder="Search places..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => results.length > 0 && setOpen(true)}
-          className="bg-transparent text-sm outline-none placeholder:text-muted-foreground w-40 lg:w-56"
+          className="bg-transparent text-sm outline-none placeholder:text-muted-foreground w-full min-w-0"
         />
       </div>
 
