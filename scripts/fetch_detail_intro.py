@@ -51,7 +51,11 @@ def fetch_detail_intro(limit: int | None = None):
             time.sleep(0.5)
             continue
 
-        items = body.get("items", {}).get("item", [])
+        items_wrap = body.get("items", {})
+        if not isinstance(items_wrap, dict):
+            time.sleep(0.3)
+            continue
+        items = items_wrap.get("item", [])
         if isinstance(items, dict):
             items = [items]
 
