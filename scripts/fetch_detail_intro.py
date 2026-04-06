@@ -81,13 +81,18 @@ def fetch_detail_intro(limit: int | None = None):
             )
             use_time = item.get("usefee") or item.get("usetimefestival")
 
-            cur.execute("""
-                UPDATE place_details
-                SET open_time = %s, rest_date = %s, parking = %s, use_time = %s
-                WHERE content_id = %s
-            """, (open_time, rest_date, parking, use_time, content_id))
-            db.commit()
-            saved += 1
+            try:
+                cur.execute("""
+                    UPDATE place_details
+                    SET open_time = %s, rest_date = %s, parking = %s, use_time = %s
+                    WHERE content_id = %s
+                """, (open_time, rest_date, parking, use_time, content_id))
+                db.commit()
+                saved += 1
+            except Exception as e:
+                db.rollback()
+                print(f"  DB error for {content_id}: {e}")
+                errors += 1
 
         if (i + 1) % 50 == 0:
             print(f"  Processed {i + 1}/{len(places)}, saved {saved}, errors {errors}")
