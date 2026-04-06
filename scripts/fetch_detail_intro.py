@@ -28,6 +28,7 @@ def fetch_detail_intro(limit: int | None = None):
     print(f"Found {len(places)} places without intro details")
 
     saved = 0
+    errors = 0
     for i, (content_id, content_type_id) in enumerate(places):
         try:
             body = api_request("detailIntro2", {
@@ -38,6 +39,17 @@ def fetch_detail_intro(limit: int | None = None):
             print(f"\n{e}")
             print(f"  Saved {saved}/{len(places)} before quota ran out.")
             break
+        except Exception as e:
+            print(f"  Error fetching {content_id}: {e}")
+            errors += 1
+            time.sleep(0.5)
+            continue
+
+        if not isinstance(body, dict):
+            print(f"  Unexpected response for {content_id}: {str(body)[:200]}")
+            errors += 1
+            time.sleep(0.5)
+            continue
 
         items = body.get("items", {}).get("item", [])
         if isinstance(items, dict):
@@ -74,13 +86,13 @@ def fetch_detail_intro(limit: int | None = None):
             saved += 1
 
         if (i + 1) % 50 == 0:
-            print(f"  Processed {i + 1}/{len(places)}, saved {saved}")
+            print(f"  Processed {i + 1}/{len(places)}, saved {saved}, errors {errors}")
 
         time.sleep(0.3)  # Rate limiting — operational account
 
     cur.close()
     db.close()
-    print(f"\nDone. Saved {saved}/{len(places)} places.")
+    print(f"\nDone. Saved {saved}/{len(places)} places. Errors: {errors}")
 
 
 if __name__ == "__main__":
