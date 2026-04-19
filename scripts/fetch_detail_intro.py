@@ -53,46 +53,77 @@ def fetch_detail_intro(limit: int | None = None):
 
         items_wrap = body.get("items", {})
         if not isinstance(items_wrap, dict):
-            time.sleep(0.3)
-            continue
-        items = items_wrap.get("item", [])
-        if isinstance(items, dict):
-            items = [items]
+            items = []
+        else:
+            items = items_wrap.get("item", [])
+            if isinstance(items, dict):
+                items = [items]
+
+        # Extract fields — default to '' so NULL rows aren't re-processed
+        open_time = ''
+        rest_date = ''
+        parking = ''
+        use_time = ''
 
         if items:
             item = items[0]
-            # Field names vary by content type
+            # Field names vary by content type:
+            # 75 courses: usetimeleports, restdateleports, parkingleports, usefeeleports
+            # 76 attractions: usetime, restdate, parking, usefee
+            # 77 leisure: operationtimetraffic, parkingtraffic
+            # 78 culture: usetimeculture, restdateculture, parkingculture, usefee
+            # 79 shopping: opentime, restdateshopping, parkingshopping
+            # 80 hotels: checkintime/checkouttime, parkinglodging
+            # 82 restaurants: opentimefood, restdatefood, parkingfood
+            # 85 festivals: playtime, usetimefestival
             open_time = (
                 item.get("usetime") or
                 item.get("opentime") or
                 item.get("usetimeculture") or
                 item.get("playtime") or
-                item.get("opentimefood")
+                item.get("opentimefood") or
+                item.get("usetimeleports") or
+                item.get("operationtimetraffic") or
+                item.get("checkintime") or
+                ''
             )
             rest_date = (
                 item.get("restdate") or
                 item.get("restdateculture") or
-                item.get("restdatefood")
+                item.get("restdatefood") or
+                item.get("restdateshopping") or
+                item.get("restdateleports") or
+                ''
             )
             parking = (
                 item.get("parking") or
                 item.get("parkingculture") or
-                item.get("parkingfood")
+                item.get("parkingfood") or
+                item.get("parkingshopping") or
+                item.get("parkinglodging") or
+                item.get("parkingleports") or
+                item.get("parkingtraffic") or
+                ''
             )
-            use_time = item.get("usefee") or item.get("usetimefestival")
+            use_time = (
+                item.get("usefee") or
+                item.get("usetimefestival") or
+                item.get("usefeeleports") or
+                ''
+            )
 
-            try:
-                cur.execute("""
-                    UPDATE place_details
-                    SET open_time = %s, rest_date = %s, parking = %s, use_time = %s
-                    WHERE content_id = %s
-                """, (open_time, rest_date, parking, use_time, content_id))
-                db.commit()
-                saved += 1
-            except Exception as e:
-                db.rollback()
-                print(f"  DB error for {content_id}: {e}")
-                errors += 1
+        try:
+            cur.execute("""
+                UPDATE place_details
+                SET open_time = %s, rest_date = %s, parking = %s, use_time = %s
+                WHERE content_id = %s
+            """, (open_time, rest_date, parking, use_time, content_id))
+            db.commit()
+            saved += 1
+        except Exception as e:
+            db.rollback()
+            print(f"  DB error for {content_id}: {e}")
+            errors += 1
 
         if (i + 1) % 50 == 0:
             print(f"  Processed {i + 1}/{len(places)}, saved {saved}, errors {errors}")
