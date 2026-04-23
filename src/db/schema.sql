@@ -27,10 +27,11 @@ CREATE TABLE place_details (
     content_id BIGINT PRIMARY KEY REFERENCES places(content_id),
     overview TEXT,
     homepage TEXT,
-    open_time VARCHAR(500),
-    rest_date VARCHAR(500),
-    parking VARCHAR(500),
-    use_time VARCHAR(500)
+    open_time TEXT,
+    rest_date TEXT,
+    parking TEXT,
+    use_time TEXT,
+    ai_summary TEXT
 );
 
 -- Place images table

@@ -24,6 +24,7 @@ export interface PlaceDetail {
   rest_date: string | null;
   parking: string | null;
   use_time: string | null;
+  ai_summary: string | null;
 }
 
 export interface PlaceImage {

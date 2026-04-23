@@ -102,6 +102,7 @@ export default async function PlacePage({ params }: PageProps) {
 
       <PlaceInfo
         overview={details?.overview}
+        aiSummary={details?.ai_summary}
         tel={place.tel}
         homepage={details?.homepage}
         openTime={details?.open_time}

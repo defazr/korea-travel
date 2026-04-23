@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface PlaceInfoProps {
   overview: string | null | undefined;
+  aiSummary: string | null | undefined;
   tel: string | null | undefined;
   homepage: string | null | undefined;
   openTime: string | null | undefined;
@@ -12,6 +13,7 @@ interface PlaceInfoProps {
 
 export default function PlaceInfo({
   overview,
+  aiSummary,
   tel,
   homepage,
   openTime,
@@ -21,22 +23,34 @@ export default function PlaceInfo({
 }: PlaceInfoProps) {
   return (
     <section className="mb-8 space-y-6">
-      {overview ? (
-        <div>
-          <h2 className="mb-2 text-xl font-semibold">About</h2>
+      <div>
+        <h2 className="mb-2 text-xl font-semibold">About</h2>
+        {aiSummary && aiSummary.length > 0 ? (
+          <>
+            <p className="text-muted-foreground leading-relaxed">{aiSummary}</p>
+            {overview && (
+              <details className="mt-3">
+                <summary className="text-muted-foreground cursor-pointer text-xs hover:text-foreground">
+                  View original description
+                </summary>
+                <div
+                  className="text-muted-foreground mt-2 text-sm leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: overview }}
+                />
+              </details>
+            )}
+          </>
+        ) : overview ? (
           <div
             className="text-muted-foreground leading-relaxed"
             dangerouslySetInnerHTML={{ __html: overview }}
           />
-        </div>
-      ) : (
-        <div>
-          <h2 className="mb-2 text-xl font-semibold">About</h2>
+        ) : (
           <p className="text-muted-foreground italic">
             Travel information coming soon.
           </p>
-        </div>
-      )}
+        )}
+      </div>
 
       <Card>
         <CardHeader>
