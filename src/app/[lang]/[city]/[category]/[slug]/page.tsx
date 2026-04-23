@@ -14,6 +14,7 @@ import PlaceHero from "@/components/place/PlaceHero";
 import PlaceInfo from "@/components/place/PlaceInfo";
 import PlaceMap from "@/components/place/PlaceMap";
 import NearbySection from "@/components/place/NearbySection";
+import InlineNearbyLinks from "@/components/place/InlineNearbyLinks";
 import RelatedCategorySection from "@/components/place/RelatedCategorySection";
 
 export const revalidate = 3600;
@@ -108,6 +109,8 @@ export default async function PlacePage({ params }: PageProps) {
         parking={details?.parking}
         useTime={details?.use_time}
       />
+
+      <InlineNearbyLinks nearby={nearby} lang={lang} />
 
       {place.mapx && place.mapy && (
         <PlaceMap lat={place.mapy} lng={place.mapx} title={place.title} />
