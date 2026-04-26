@@ -1,6 +1,6 @@
 # Session Handoff — Latest State
 
-Last updated: 2026-04-19
+Last updated: 2026-04-26
 
 ## Quick Start (다음 세션용)
 
@@ -13,13 +13,29 @@ git pull origin claude/add-github-repo-url-knsbO
 
 ---
 
-## 현재 Phase: 데이터 수집 완료 → 인덱싱 대기
+## 현재 Phase: Phase 2 — AI 요약 생성 (1,250/15,272)
 
 - **사이트**: https://travel.in-book.co.kr — 가동 중
 - **데이터 파이프라인**: 4단계 전부 완료 (places, detailCommon, images, detailIntro)
+- **AI 요약**: 1,250건 생성 완료 (Mac Ollama gemma4)
 - **cron**: 비활성화 (주석 처리, 2026-04-19)
 - **GSC**: 등록 완료
 - **GA4**: G-VMMYCGD376 설치 완료
+
+---
+
+## AI 요약 실행 방법
+
+```bash
+# 터미널 1: SSH 터널
+ssh -L 5433:localhost:5432 root@141.164.41.235
+
+# 터미널 2: 실행 (Mac에서 충전기 꽂고)
+cd scripts && python3 generate_summaries.py --limit 1000
+```
+
+- 단계적 확장: 50 → 200 → 1000 완료. 다음: GSC 관찰 후 전체 확장
+- caffeinate 필요 시: `caffeinate -i python3 generate_summaries.py --limit 1000`
 
 ---
 
@@ -46,9 +62,10 @@ cron 재활성화 필요 시: `crontab -e`에서 주석 해제
 
 ## 다음 세션 우선순위
 
-1. GSC 데이터 확인 → CTR 최적화
-2. explorekorea.com 이전 계획
-3. Bing Webmaster Tools 등록
+1. GSC 3~5일 관찰 결과 확인 (4/29~5/1)
+2. 안정 확인 후 AI 요약 전체 확장 (~14,000건 잔여)
+3. explorekorea.com 이전 계획
+4. Bing Webmaster Tools 등록
 
 ---
 
@@ -70,8 +87,9 @@ cron 재활성화 필요 시: `crontab -e`에서 주석 해제
 | 용도 | 파일 |
 |------|------|
 | SSOT | CLAUDE.md |
-| GPT 핸드오프 | GPT-HANDOFF-2026-04-19.md |
-| 이전 핸드오프 | GPT-HANDOFF-2026-04-12.md, GPT-HANDOFF-2026-04-05.md |
+| GPT 핸드오프 | GPT-HANDOFF-2026-04-26.md |
+| 이전 핸드오프 | GPT-HANDOFF-2026-04-19.md, GPT-HANDOFF-2026-04-12.md, GPT-HANDOFF-2026-04-05.md |
 | 이 문서 | SESSION-HANDOFF.md |
 | 크롤러 설정 | scripts/config.py |
+| AI 요약 생성 | scripts/generate_summaries.py |
 | 크롤러 (intro) | scripts/fetch_detail_intro.py |
