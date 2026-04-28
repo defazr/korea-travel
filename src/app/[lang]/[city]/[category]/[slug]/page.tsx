@@ -178,6 +178,6 @@ function buildJsonLd(
       latitude: place.mapy,
       longitude: place.mapx,
     },
-    url: `https://travel.in-book.co.kr/${lang}/${city}/${category}/${encodeURIComponent(place.title)}`,
+    url: `https://travel.in-book.co.kr/${lang}/${city}/${category}/${place.slug}`,
   };
 }
