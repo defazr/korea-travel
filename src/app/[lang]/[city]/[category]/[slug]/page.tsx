@@ -143,7 +143,7 @@ export default async function PlacePage({ params }: PageProps) {
 }
 
 function buildJsonLd(
-  place: { title: string; mapx: number; mapy: number; content_type_id: number },
+  place: { title: string; slug: string; mapx: number; mapy: number; content_type_id: number },
   details: { overview?: string | null } | null,
   category: string,
   imageUrl: string,
