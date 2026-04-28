@@ -1,6 +1,6 @@
 # Session Handoff — Latest State
 
-Last updated: 2026-04-26
+Last updated: 2026-04-28
 
 ## Quick Start (다음 세션용)
 
@@ -62,7 +62,7 @@ cron 재활성화 필요 시: `crontab -e`에서 주석 해제
 
 ## 다음 세션 우선순위
 
-1. GSC 3~5일 관찰 결과 확인 (4/29~5/1)
+1. GSC 관찰 결과 확인 (404 자연 소멸 여부)
 2. 안정 확인 후 AI 요약 전체 확장 (~14,000건 잔여)
 3. explorekorea.com 이전 계획
 4. Bing Webmaster Tools 등록
@@ -73,7 +73,8 @@ cron 재활성화 필요 시: `crontab -e`에서 주석 해제
 
 | 이슈 | 해결 | 날짜 |
 |------|------|------|
-| **detailIntro 무한루프** | content_type별 필드명 매핑 추가 + 빈 문자열 기본값 | 04-19 |
+| **JSON-LD url에 title 사용 → GSC 404** | `encodeURIComponent(place.title)` → `place.slug` | 04-28 |
+| detailIntro 무한루프 | content_type별 필드명 매핑 추가 + 빈 문자열 기본값 | 04-19 |
 | 크롤러 non-dict body 에러 | isinstance 체크 + continue | 04-06 |
 | items 필드 빈 문자열 | items_wrap 타입 체크 | 04-06 |
 | varchar(500) 초과 | TEXT로 변경 + try/except rollback | 04-07 |
@@ -87,8 +88,8 @@ cron 재활성화 필요 시: `crontab -e`에서 주석 해제
 | 용도 | 파일 |
 |------|------|
 | SSOT | CLAUDE.md |
-| GPT 핸드오프 | GPT-HANDOFF-2026-04-26.md |
-| 이전 핸드오프 | GPT-HANDOFF-2026-04-19.md, GPT-HANDOFF-2026-04-12.md, GPT-HANDOFF-2026-04-05.md |
+| GPT 핸드오프 | GPT-HANDOFF-2026-04-28.md |
+| 이전 핸드오프 | GPT-HANDOFF-2026-04-26.md, GPT-HANDOFF-2026-04-19.md, GPT-HANDOFF-2026-04-12.md, GPT-HANDOFF-2026-04-05.md |
 | 이 문서 | SESSION-HANDOFF.md |
 | 크롤러 설정 | scripts/config.py |
 | AI 요약 생성 | scripts/generate_summaries.py |
