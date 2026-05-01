@@ -30,6 +30,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const cityName = city.charAt(0).toUpperCase() + city.slice(1);
   const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
 
+  const areaCode = CITY_TO_AREA[city];
+  const contentTypeId = CATEGORY_TO_TYPE[category];
+  const count = areaCode && contentTypeId ? await countPlacesByCategory(areaCode, contentTypeId) : 0;
+
   return {
     title: `${categoryName} in ${cityName} – Korea Travel Guide`,
     description: `Discover the best ${category} in ${cityName}, South Korea. Browse ${category} with photos, addresses, and travel information.`,
@@ -40,6 +44,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: `${categoryName} in ${cityName} – Korea Travel Guide`,
       description: `Discover the best ${category} in ${cityName}, South Korea.`,
     },
+    ...(count === 0 && { robots: { index: false, follow: true } }),
   };
 }
 

@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getAllPlacesForSitemap } from "@/lib/queries";
+import { getAllPlacesForSitemap, countPlacesByCategory } from "@/lib/queries";
 import { CONTENT_TYPE_MAP, AREA_CODE_MAP } from "@/lib/constants";
 
 const BASE_URL = "https://travel.in-book.co.kr";
@@ -26,15 +26,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
-  // Category pages per city
-  const categories = Object.values(CONTENT_TYPE_MAP);
-  for (const city of cities) {
-    for (const category of categories) {
-      entries.push({
-        url: `${BASE_URL}/en/${city}/${category}`,
-        changeFrequency: "weekly",
-        priority: 0.7,
-      });
+  // Category pages per city (skip empty combinations)
+  const areaEntries = Object.entries(AREA_CODE_MAP);
+  const typeEntries = Object.entries(CONTENT_TYPE_MAP);
+  for (const [areaCode, city] of areaEntries) {
+    for (const [typeId, category] of typeEntries) {
+      const count = await countPlacesByCategory(parseInt(areaCode), parseInt(typeId));
+      if (count > 0) {
+        entries.push({
+          url: `${BASE_URL}/en/${city}/${category}`,
+          changeFrequency: "weekly",
+          priority: 0.7,
+        });
+      }
     }
   }
 
